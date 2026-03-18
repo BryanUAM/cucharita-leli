@@ -180,23 +180,33 @@ namespace CucharitaLeliQR.Controllers
 
         public IActionResult GenerarQR(int id)
         {
-            var cliente = _context.Clientes.Find(id);
-
-            if (cliente == null)
-                return NotFound();
-
-            // URL que se abrirá al escanear
-            string url = $"https://localhost:5001/Clientes/SumarPuntosQR/{cliente.CodigoQR}";
-
-            QRCodeGenerator qrGenerator = new QRCodeGenerator();
-            QRCodeData qrCodeData = qrGenerator.CreateQrCode(url, QRCodeGenerator.ECCLevel.Q);
-            QRCode qrCode = new QRCode(qrCodeData);
-
-            using (Bitmap qrImage = qrCode.GetGraphic(20))
-            using (MemoryStream ms = new MemoryStream())
+            try
             {
-                qrImage.Save(ms, System.Drawing.Imaging.ImageFormat.Png);
-                return File(ms.ToArray(), "image/png");
+                var cliente = _context.Clientes.Find(id);
+
+                if (cliente == null)
+                    return Content("Error: cliente no encontrado");
+
+                if (string.IsNullOrEmpty(cliente.CodigoQR))
+                {
+                    cliente.CodigoQR = Guid.NewGuid().ToString();
+                    _context.SaveChanges();
+                }
+
+                string url = $"https://cucharita-leli.onrender.com/Clientes/SumarPuntosQR/{cliente.CodigoQR}";
+
+                using (QRCodeGenerator qrGenerator = new QRCodeGenerator())
+                using (QRCodeData qrCodeData = qrGenerator.CreateQrCode(url, QRCodeGenerator.ECCLevel.Q))
+                {
+                    PngByteQRCode qrCode = new PngByteQRCode(qrCodeData);
+                    byte[] qrBytes = qrCode.GetGraphic(20);
+
+                    return File(qrBytes, "image/png");
+                }
+            }
+            catch (Exception ex)
+            {
+                return Content("ERROR REAL: " + ex.ToString());
             }
         }
         public IActionResult Dashboard()
