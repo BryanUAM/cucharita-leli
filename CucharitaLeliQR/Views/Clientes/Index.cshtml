@@ -1,0 +1,221 @@
+﻿@model List<CucharitaLeliQR.Models.Cliente>
+
+<div style="
+    background-image: url('/images/restaurant.png');
+    background-size: cover;
+    background-position: center;
+    min-height: 100vh;
+">
+
+    <div style="
+        background: rgba(0,0,0,0.75);
+        min-height: 100vh;
+        padding: 30px;
+    ">
+
+        <div style="max-width: 550px; margin:auto; color:white;">
+
+            <h3 class="text-center mb-4">Clientes</h3>
+
+            @foreach (var item in Model)
+            {
+                <div id="cliente-@item.Id"
+                     class="mb-4 p-4 rounded-4"
+                     style="background: rgba(255,255,255,0.12); backdrop-filter: blur(12px);">
+
+                    <!-- NOMBRE Y PUNTOS -->
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h4 style="margin:0;">@item.Nombre</h4>
+
+                        <div id="puntos-@item.Id" style="font-size:18px;">
+                            ⭐ @item.Puntos
+                        </div>
+                    </div>
+                    <div id="premios-@item.Id" style="font-size:13px; color:#d4af37;">
+                        🎁 @item.PremiosCanjeados canjeados
+                    </div>
+
+                    <!-- FECHA -->
+                    <div id="fecha-@item.Id" style="font-size:14px; opacity:0.7;">
+                        @if (item.UltimoEscaneo != null)
+                        {
+                            <span>Último: @item.UltimoEscaneo.Value.ToString("dd/MM/yyyy HH:mm")</span>
+                        }
+                        else
+                        {
+                            <span>Sin escaneos</span>
+                        }
+                    </div>
+
+                    <!-- BOTONES (CORRECTO) -->
+                    <div class="d-flex gap-3 mt-3 flex-wrap" id="acciones-@item.Id">
+
+                        <a asp-action="GenerarQR"
+                           asp-route-id="@item.Id"
+                           class="btn btn-outline-light btn-lg px-4">
+                            QR
+                        </a>
+                        <a asp-action="Edit"
+                           asp-route-id="@item.Id"
+                           class="btn btn-outline-warning btn-lg px-4">
+                            ✏ Editar
+                        </a>
+
+                        @if (item.Puntos < 100)
+                        {
+                            <button onclick="sumarPuntos(@item.Id)"
+                                    class="btn btn-light btn-lg px-4"
+                                    id="btn-sumar-@item.Id">
+                                +20
+                            </button>
+                        }
+                        else
+                        {
+                            <button onclick="entregarPremio(@item.Id)"
+                                    class="btn btn-warning btn-lg px-4"
+                                    id="btn-premio-@item.Id">
+                                🎁 Premio
+                            </button>
+                        }
+
+                        <a asp-action="Eliminar"
+                           asp-route-id="@item.Id"
+                           class="btn btn-outline-danger btn-lg px-4"
+                           onclick="return confirm('¿Eliminar cliente?');">
+                            🗑
+                        </a>
+
+                    </div>
+
+                </div>
+            }
+
+            <div class="mt-4 d-grid">
+                <a asp-action="Dashboard" class="btn btn-outline-light btn-lg">
+                    Volver
+                </a>
+            </div>
+
+        </div>
+
+    </div>
+</div>
+
+<div id="modalResultado" style="
+    display:none;
+    position:fixed;
+    top:0;
+    left:0;
+    width:100%;
+    height:100%;
+    background: rgba(0,0,0,0.8);
+    z-index:9999;
+    justify-content:center;
+    align-items:center;
+">
+
+    <div style="
+        background:white;
+        border-radius:20px;
+        padding:30px;
+        width:90%;
+        max-width:400px;
+        text-align:center;
+    ">
+
+        <h2 id="modalTitulo" style="color:green;">Resultado</h2>
+
+        <h4 id="modalNombre"></h4>
+        <h3 id="modalPuntos"></h3>
+        <p id="modalMensaje"></p>
+
+        <button onclick="cerrarModal()" class="btn btn-dark mt-3">
+            Cerrar
+        </button>
+
+    </div>
+</div>
+
+
+<script>
+    function sumarPuntos(id) {
+
+        fetch(`/Clientes/SumarPuntosAjax?id=${id}`)
+            .then(response => response.json())
+            .then(data => {
+
+                let puntosDiv = document.getElementById("puntos-" + id);
+                puntosDiv.innerText = "⭐ " + data.puntos;
+
+                // 🔥 ANIMACIÓN
+                puntosDiv.style.transform = "scale(1.2)";
+                setTimeout(() => {
+                    puntosDiv.style.transform = "scale(1)";
+                }, 200);
+
+                // 🔥 FECHA
+                    let fechaTexto = data.fecha ? data.fecha : "Sin escaneos";
+
+    document.getElementById("fecha-" + id).innerText =
+        "Último: " + fechaTexto;
+
+                // 🔥 SI LLEGA A 100
+                if (data.puntos >= 100) {
+
+                    puntosDiv.style.color = "#d4af37";
+
+                    let contenedor = document.getElementById("acciones-" + id);
+
+                    contenedor.innerHTML = `
+                        <a href="/Clientes/GenerarQR/${id}" class="btn btn-outline-light btn-lg px-4">QR</a>
+                        <button onclick="entregarPremio(${id})" class="btn btn-warning btn-lg px-4">🎁 Premio</button>
+                        <a href="/Clientes/Eliminar/${id}" class="btn btn-outline-danger btn-lg px-4">🗑</a>
+                    `;
+                }
+
+                // 💥 MODAL (LO IMPORTANTE)
+                document.getElementById("modalTitulo").innerText = "+20 puntos agregados";
+                document.getElementById("modalNombre").innerText = "Cliente: " + data.nombre;
+                document.getElementById("modalPuntos").innerText = "⭐ " + data.puntos;
+                document.getElementById("modalMensaje").innerText = data.mensaje;
+
+                document.getElementById("modalResultado").style.display = "flex";
+            });
+    }
+
+    function entregarPremio(id) {
+
+        fetch(`/Clientes/EntregarPremioAjax?id=${id}`)
+            .then(response => response.json())
+                .then(data => {let premiosDiv = document.getElementById("premios-" + id);
+    if (premiosDiv) {
+        premiosDiv.innerText = "🎁 " + data.premios + " canjeados";
+    }
+
+                document.getElementById("puntos-" + id).innerText = "⭐ 0";
+
+                document.getElementById("fecha-" + id).innerText =
+                    "Último: " + data.fecha;
+
+                let contenedor = document.getElementById("acciones-" + id);
+
+                contenedor.innerHTML = `
+                    <a href="/Clientes/GenerarQR/${id}" class="btn btn-outline-light btn-lg px-4">QR</a>
+                    <button onclick="sumarPuntos(${id})" class="btn btn-light btn-lg px-4">+20</button>
+                    <a href="/Clientes/Eliminar/${id}" class="btn btn-outline-danger btn-lg px-4">🗑</a>
+                `;
+
+                // 💥 MODAL TAMBIÉN AQUÍ
+                document.getElementById("modalTitulo").innerText = "🎁 Premio entregado";
+                document.getElementById("modalNombre").innerText = "Cliente: " + data.nombre;
+                document.getElementById("modalPuntos").innerText = "Puntos reiniciados";
+                document.getElementById("modalMensaje").innerText = "✅ Todo correcto";
+
+                document.getElementById("modalResultado").style.display = "flex";
+            });
+    }
+
+    function cerrarModal() {
+        document.getElementById("modalResultado").style.display = "none";
+    }
+</script>

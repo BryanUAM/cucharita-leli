@@ -1,0 +1,74 @@
+﻿@model CucharitaLeliQR.Models.Cliente
+
+<div style="
+    background-image: url('/images/restaurant.png');
+    background-size: cover;
+    background-position: center;
+    min-height: 100vh;
+">
+
+    <!-- OVERLAY OSCURO -->
+    <div style="
+        background: rgba(0,0,0,0.75);
+        min-height: 100vh;
+        padding: 30px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    ">
+
+        <!-- TARJETA MÁS GRANDE -->
+        <div style="
+            width: 100%;
+            max-width: 500px;
+            background: rgba(255,255,255,0.12);
+            backdrop-filter: blur(12px);
+            border-radius: 20px;
+            padding: 35px;
+            color: white;
+        ">
+
+            <!-- TÍTULO MÁS GRANDE -->
+            <h3 class="text-center mb-4" style="font-weight:700;">
+                👤 Nuevo Cliente
+            </h3>
+
+            <form asp-action="Create" method="post">
+                @Html.AntiForgeryToken()
+
+                @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+
+                <!-- NOMBRE -->
+                <div class="mb-4">
+                    <label class="form-label" style="font-size:16px;">Nombre</label>
+                    <input asp-for="Nombre"
+                           class="form-control form-control-lg"
+                           placeholder="Ej: Juan Pérez"
+                           style="border-radius:12px;" />
+                </div>
+
+                <!-- BOTÓN GUARDAR MÁS GRANDE -->
+                <div class="d-grid">
+                    <button type="submit"
+                            class="btn btn-success btn-lg rounded-pill"
+                            style="padding:15px; font-weight:600;">
+                        💾 Guardar Cliente
+                    </button>
+                </div>
+
+                <!-- VOLVER MÁS GRANDE -->
+                <div class="text-center mt-4">
+                    <a href="/Home/Index"
+                       class="btn btn-outline-light btn-lg rounded-pill"
+                       style="padding:10px 20px;">
+                        ← Volver
+                    </a>
+                </div>
+
+            </form>
+
+        </div>
+
+    </div>
+
+</div>
