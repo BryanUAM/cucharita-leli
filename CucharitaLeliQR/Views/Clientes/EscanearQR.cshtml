@@ -54,11 +54,46 @@
 
         <!-- CÁMARA -->
         <div id="reader" style="
-            width:100%;
-            height:100%;
-            border-radius:20px;
-            overflow:hidden;
-        "></div>
+    position:absolute;
+    top:0;
+    left:0;
+    width:100%;
+    height:100%;
+    border-radius:20px;
+    overflow:hidden;
+"></div>
+        </div>
+
+    <div id="modalResultadoQR" style="
+    display:none;
+    position:fixed;
+    top:0;
+    left:0;
+    width:100%;
+    height:100%;
+    background: rgba(0,0,0,0.75);
+    z-index:9999;
+    justify-content:center;
+    align-items:center;
+">
+        <div style="
+        width:90%;
+        max-width:400px;
+        background:#111;
+        border-radius:20px;
+        padding:25px;
+        text-align:center;
+        color:white;
+    ">
+            <h2 id="tituloResultadoQR">Resultado</h2>
+            <p id="nombreResultadoQR"></p>
+            <h3 id="puntosResultadoQR"></h3>
+            <p id="faltanResultadoQR"></p>
+
+            <button onclick="cerrarModalResultadoQR()" class="btn btn-warning mt-3">
+                Cerrar
+            </button>
+        </div>
     </div>
 
     <!-- ESTADO -->
@@ -100,37 +135,73 @@
 </style>
 
 <script>
-        function onScanSuccess(decodedText, decodedResult) {
+    function onScanSuccess(decodedText, decodedResult) {
 
         document.getElementById("estado").innerText = "✅ Código detectado";
 
-        html5QrCode.stop(); // 👈 evita múltiples lecturas
+        html5QrCode.stop();
 
-        setTimeout(() => {
-            window.location.href = decodedText;
-        }, 800);
+        fetch('/Clientes/ProcesarEscaneoInterno', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded'
+            },
+            body: 'codigo=' + encodeURIComponent(decodedText)
+        })
+        .then(response => response.json())
+            .then(data => {
+        if (data.ok) {
+            document.getElementById("tituloResultadoQR").innerText = "✅ Puntos agregados";
+            document.getElementById("nombreResultadoQR").innerText = "Cliente: " + data.nombre;
+            document.getElementById("puntosResultadoQR").innerText = "⭐ " + data.puntos;
+            document.getElementById("faltanResultadoQR").innerText = "Faltan: " + data.faltan + " puntos";
+        } else {
+            document.getElementById("tituloResultadoQR").innerText = "❌ Error";
+            document.getElementById("nombreResultadoQR").innerText = data.mensaje;
+            document.getElementById("puntosResultadoQR").innerText = "";
+            document.getElementById("faltanResultadoQR").innerText = "";
+        }
+
+        document.getElementById("modalResultadoQR").style.display = "flex";
+    })
+        .catch(error => {
+            console.log("Error al procesar escaneo:", error);
+            document.getElementById("estado").innerText = "❌ Error al procesar el código";
+
+            setTimeout(() => {
+                html5QrCode.start(
+                    cameraIdGlobal,
+                    {
+                        fps: 10,
+                        qrbox: 250
+                    },
+                    onScanSuccess,
+                    onScanError
+                );
+            }, 2000);
+        });
     }
 
     function onScanError(errorMessage) {
         // silencioso
     }
 
-        let html5QrCode = new Html5Qrcode("reader");
+    let html5QrCode = new Html5Qrcode("reader");
+    let cameraIdGlobal = null;
 
     Html5Qrcode.getCameras().then(devices => {
 
         if (devices && devices.length) {
 
-            // Buscar cámara trasera
             let backCamera = devices.find(d =>
                 d.label.toLowerCase().includes("back") ||
                 d.label.toLowerCase().includes("trasera")
             );
 
-            let cameraId = backCamera ? backCamera.id : devices[0].id;
+            cameraIdGlobal = backCamera ? backCamera.id : devices[0].id;
 
             html5QrCode.start(
-                cameraId,
+                cameraIdGlobal,
                 {
                     fps: 10,
                     qrbox: 250
@@ -142,6 +213,20 @@
 
     }).catch(err => {
         console.log("Error cámara:", err);
+        document.getElementById("estado").innerText = "❌ No se pudo acceder a la cámara";
     });
 
+        function cerrarModalResultadoQR() {
+        document.getElementById("modalResultadoQR").style.display = "none";
+
+        html5QrCode.start(
+            cameraIdGlobal,
+            {
+                fps: 10,
+                qrbox: 250
+            },
+            onScanSuccess,
+            onScanError
+        );
+    }
 </script>

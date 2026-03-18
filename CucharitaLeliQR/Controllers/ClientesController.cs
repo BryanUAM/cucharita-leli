@@ -86,10 +86,22 @@ namespace CucharitaLeliQR.Controllers
 
         public IActionResult SumarPuntosQR(string id)
         {
-            var cliente = _context.Clientes.FirstOrDefault(c => c.CodigoQR == id);
+            return Content("Este código QR solo puede ser procesado desde el sistema interno de caja.");
+        }
+
+        [HttpPost]
+        public IActionResult ProcesarEscaneoInterno(string codigo)
+        {
+            var cliente = _context.Clientes.FirstOrDefault(c => c.CodigoQR == codigo);
 
             if (cliente == null)
-                return Content("Cliente no encontrado");
+            {
+                return Json(new
+                {
+                    ok = false,
+                    mensaje = "Cliente no encontrado"
+                });
+            }
 
             cliente.Puntos += 20;
 
@@ -97,10 +109,20 @@ namespace CucharitaLeliQR.Controllers
                 cliente.Puntos = 100;
 
             cliente.UltimoEscaneo = DateTime.UtcNow;
-
             _context.SaveChanges();
 
-            return View("ResultadoQR", cliente);
+            int faltan = 100 - cliente.Puntos;
+            if (faltan < 0)
+                faltan = 0;
+
+            return Json(new
+            {
+                ok = true,
+                nombre = cliente.Nombre,
+                puntos = cliente.Puntos,
+                faltan = faltan,
+                mensaje = "Puntos agregados correctamente"
+            });
         }
 
         [HttpGet]
@@ -187,10 +209,10 @@ namespace CucharitaLeliQR.Controllers
                     _context.SaveChanges();
                 }
 
-                string url = $"https://cucharita-leli.onrender.com/Clientes/SumarPuntosQR/{cliente.CodigoQR}";
+                string contenidoQR = cliente.CodigoQR;
 
                 using (QRCodeGenerator qrGenerator = new QRCodeGenerator())
-                using (QRCodeData qrCodeData = qrGenerator.CreateQrCode(url, QRCodeGenerator.ECCLevel.Q))
+                using (QRCodeData qrCodeData = qrGenerator.CreateQrCode(contenidoQR, QRCodeGenerator.ECCLevel.Q))
                 {
                     PngByteQRCode qrCode = new PngByteQRCode(qrCodeData);
                     byte[] qrBytes = qrCode.GetGraphic(20);
