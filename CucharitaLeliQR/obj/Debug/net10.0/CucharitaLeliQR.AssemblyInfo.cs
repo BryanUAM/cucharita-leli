@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("CucharitaLeliQR")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+72379ba48c0c4800eb53ba1a44f956dce7c6e83c")]
 [assembly: System.Reflection.AssemblyProductAttribute("CucharitaLeliQR")]
 [assembly: System.Reflection.AssemblyTitleAttribute("CucharitaLeliQR")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
