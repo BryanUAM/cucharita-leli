@@ -100,7 +100,7 @@ namespace CucharitaLeliQR.Controllers
 
             _context.SaveChanges();
 
-            return Content($"Puntos agregados correctamente a {cliente.Nombre}. Total actual: {cliente.Puntos}");
+            return View("ResultadoQR", cliente);
         }
 
         [HttpGet]
