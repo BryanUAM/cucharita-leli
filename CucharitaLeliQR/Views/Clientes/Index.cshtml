@@ -5,13 +5,11 @@
     background-size: cover;
     min-height: 100vh;
 ">
-
     <div style="
         background: rgba(0,0,0,0.45);
         min-height: 100vh;
         padding: 30px;
     ">
-
         <div style="max-width: 550px; margin:auto; color:white;">
 
             <h3 class="text-center mb-4">Clientes</h3>
@@ -22,19 +20,18 @@
                      class="mb-4 p-4 rounded-4"
                      style="background: rgba(255,255,255,0.12); backdrop-filter: blur(12px);">
 
-                    <!-- NOMBRE Y PUNTOS -->
                     <div class="d-flex justify-content-between align-items-center">
                         <h4 style="margin:0;">@item.Nombre</h4>
 
-                        <div id="puntos-@item.Id" style="font-size:18px;">
+                        <div id="puntos-@item.Id" style="font-size:18px; transition:0.2s;">
                             ⭐ @item.Puntos
                         </div>
                     </div>
+
                     <div id="premios-@item.Id" style="font-size:13px; color:#d4af37;">
                         🎁 @item.PremiosCanjeados canjeados
                     </div>
 
-                    <!-- FECHA -->
                     <div id="fecha-@item.Id" style="font-size:14px; opacity:0.7;">
                         @if (item.UltimoEscaneo != null)
                         {
@@ -46,14 +43,16 @@
                         }
                     </div>
 
-                    <!-- BOTONES (CORRECTO) -->
                     <div class="d-flex gap-3 mt-3 flex-wrap" id="acciones-@item.Id">
 
-                        <a asp-action="GenerarQR"
-                           asp-route-id="@item.Id"
-                           class="btn btn-outline-light btn-lg px-4">
-                            QR
-                        </a>
+                        <button type="button"
+                                class="btn btn-warning btn-sm"
+                                data-bs-toggle="modal"
+                                data-bs-target="#qrModal"
+                                onclick="mostrarQR(@item.Id, '@item.Nombre')">
+                            Ver QR
+                        </button>
+
                         <a asp-action="Edit"
                            asp-route-id="@item.Id"
                            class="btn btn-outline-warning btn-lg px-4">
@@ -85,7 +84,6 @@
                         </a>
 
                     </div>
-
                 </div>
             }
 
@@ -96,10 +94,57 @@
             </div>
 
         </div>
-
     </div>
 </div>
 
+<!-- MODAL QR -->
+<div class="modal fade" id="qrModal" tabindex="-1" aria-labelledby="qrModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content"
+             style="border-radius:20px; overflow:hidden; background:#1c1c1c; color:white;">
+
+            <div class="modal-header border-0" style="background: #111;">
+                <h5 class="modal-title" id="qrModalLabel">Código QR del cliente</h5>
+                <button type="button"
+                        class="btn-close btn-close-white"
+                        data-bs-dismiss="modal"
+                        aria-label="Cerrar">
+                </button>
+            </div>
+
+            <div class="modal-body text-center" style="padding:30px;">
+                <h5 id="nombreClienteQR" class="mb-3"></h5>
+
+                <div style="
+                    background:white;
+                    border-radius:18px;
+                    padding:18px;
+                    display:inline-block;
+                    box-shadow: 0 8px 20px rgba(0,0,0,0.35);
+                ">
+                    <img id="imagenQR"
+                         src=""
+                         alt="Código QR del cliente"
+                         class="img-fluid"
+                         style="max-width:250px;" />
+                </div>
+
+                <p class="mt-3 mb-0" style="opacity:0.8; font-size:14px;">
+                    Este código pertenece únicamente al cliente seleccionado.
+                </p>
+            </div>
+
+            <div class="modal-footer border-0" style="background:#111;">
+                <button type="button" class="btn btn-outline-light rounded-pill px-4" data-bs-dismiss="modal">
+                    Cerrar
+                </button>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<!-- MODAL RESULTADO -->
 <div id="modalResultado" style="
     display:none;
     position:fixed;
@@ -112,7 +157,6 @@
     justify-content:center;
     align-items:center;
 ">
-
     <div style="
         background:white;
         border-radius:20px;
@@ -121,9 +165,7 @@
         max-width:400px;
         text-align:center;
     ">
-
         <h2 id="modalTitulo" style="color:green;">Resultado</h2>
-
         <h4 id="modalNombre"></h4>
         <h3 id="modalPuntos"></h3>
         <p id="modalMensaje"></p>
@@ -131,48 +173,59 @@
         <button onclick="cerrarModal()" class="btn btn-dark mt-3">
             Cerrar
         </button>
-
     </div>
 </div>
 
-
 <script>
-    function sumarPuntos(id) {
+    function mostrarQR(id, nombre) {
+        document.getElementById("nombreClienteQR").innerText = nombre;
+        document.getElementById("imagenQR").src = '/Clientes/GenerarQR/' + id;
+    }
 
+    function sumarPuntos(id) {
         fetch(`/Clientes/SumarPuntosAjax?id=${id}`)
             .then(response => response.json())
             .then(data => {
-
                 let puntosDiv = document.getElementById("puntos-" + id);
                 puntosDiv.innerText = "⭐ " + data.puntos;
 
-                // 🔥 ANIMACIÓN
                 puntosDiv.style.transform = "scale(1.2)";
                 setTimeout(() => {
                     puntosDiv.style.transform = "scale(1)";
                 }, 200);
 
-                // 🔥 FECHA
-                    let fechaTexto = data.fecha ? data.fecha : "Sin escaneos";
+                let fechaTexto = data.fecha ? data.fecha : "Sin escaneos";
+                document.getElementById("fecha-" + id).innerText = "Último: " + fechaTexto;
 
-    document.getElementById("fecha-" + id).innerText =
-        "Último: " + fechaTexto;
-
-                // 🔥 SI LLEGA A 100
                 if (data.puntos >= 100) {
-
                     puntosDiv.style.color = "#d4af37";
 
                     let contenedor = document.getElementById("acciones-" + id);
 
                     contenedor.innerHTML = `
-                        <a href="/Clientes/GenerarQR/${id}" class="btn btn-outline-light btn-lg px-4">QR</a>
-                        <button onclick="entregarPremio(${id})" class="btn btn-warning btn-lg px-4">🎁 Premio</button>
-                        <a href="/Clientes/Eliminar/${id}" class="btn btn-outline-danger btn-lg px-4">🗑</a>
+                        <button type="button"
+                                class="btn btn-warning btn-sm"
+                                data-bs-toggle="modal"
+                                data-bs-target="#qrModal"
+                                onclick="mostrarQR(${id}, '${data.nombre}')">
+                            Ver QR
+                        </button>
+
+                        <a href="/Clientes/Edit/${id}" class="btn btn-outline-warning btn-lg px-4">
+                            ✏ Editar
+                        </a>
+
+                        <button onclick="entregarPremio(${id})" class="btn btn-warning btn-lg px-4">
+                            🎁 Premio
+                        </button>
+
+                        <a href="/Clientes/Eliminar/${id}" class="btn btn-outline-danger btn-lg px-4"
+                           onclick="return confirm('¿Eliminar cliente?');">
+                            🗑
+                        </a>
                     `;
                 }
 
-                // 💥 MODAL (LO IMPORTANTE)
                 document.getElementById("modalTitulo").innerText = "+20 puntos agregados";
                 document.getElementById("modalNombre").innerText = "Cliente: " + data.nombre;
                 document.getElementById("modalPuntos").innerText = "⭐ " + data.puntos;
@@ -183,28 +236,44 @@
     }
 
     function entregarPremio(id) {
-
         fetch(`/Clientes/EntregarPremioAjax?id=${id}`)
             .then(response => response.json())
-                .then(data => {let premiosDiv = document.getElementById("premios-" + id);
-    if (premiosDiv) {
-        premiosDiv.innerText = "🎁 " + data.premios + " canjeados";
-    }
+            .then(data => {
+                let premiosDiv = document.getElementById("premios-" + id);
+                if (premiosDiv) {
+                    premiosDiv.innerText = "🎁 " + data.premios + " canjeados";
+                }
 
                 document.getElementById("puntos-" + id).innerText = "⭐ 0";
+                document.getElementById("puntos-" + id).style.color = "white";
 
-                document.getElementById("fecha-" + id).innerText =
-                    "Último: " + data.fecha;
+                document.getElementById("fecha-" + id).innerText = "Último: " + data.fecha;
 
                 let contenedor = document.getElementById("acciones-" + id);
 
                 contenedor.innerHTML = `
-                    <a href="/Clientes/GenerarQR/${id}" class="btn btn-outline-light btn-lg px-4">QR</a>
-                    <button onclick="sumarPuntos(${id})" class="btn btn-light btn-lg px-4">+20</button>
-                    <a href="/Clientes/Eliminar/${id}" class="btn btn-outline-danger btn-lg px-4">🗑</a>
+                    <button type="button"
+                            class="btn btn-warning btn-sm"
+                            data-bs-toggle="modal"
+                            data-bs-target="#qrModal"
+                            onclick="mostrarQR(${id}, '${data.nombre}')">
+                        Ver QR
+                    </button>
+
+                    <a href="/Clientes/Edit/${id}" class="btn btn-outline-warning btn-lg px-4">
+                        ✏ Editar
+                    </a>
+
+                    <button onclick="sumarPuntos(${id})" class="btn btn-light btn-lg px-4">
+                        +20
+                    </button>
+
+                    <a href="/Clientes/Eliminar/${id}" class="btn btn-outline-danger btn-lg px-4"
+                       onclick="return confirm('¿Eliminar cliente?');">
+                        🗑
+                    </a>
                 `;
 
-                // 💥 MODAL TAMBIÉN AQUÍ
                 document.getElementById("modalTitulo").innerText = "🎁 Premio entregado";
                 document.getElementById("modalNombre").innerText = "Cliente: " + data.nombre;
                 document.getElementById("modalPuntos").innerText = "Puntos reiniciados";
