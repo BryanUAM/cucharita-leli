@@ -84,29 +84,23 @@ namespace CucharitaLeliQR.Controllers
             return View(cliente);
         }
 
-        public IActionResult SumarPuntos(int id)
+        public IActionResult SumarPuntosQR(string id)
         {
-            var cliente = _context.Clientes.Find(id);
+            var cliente = _context.Clientes.FirstOrDefault(c => c.CodigoQR == id);
 
-            if (cliente != null)
-            {
-                cliente.Puntos += 20;
+            if (cliente == null)
+                return Content("Cliente no encontrado");
 
-                cliente.UltimoEscaneo = DateTime.UtcNow;
+            cliente.Puntos += 20;
 
-                // 🔥 MENSAJE NORMAL
-                TempData["Mensaje"] = $"+20 puntos agregados";
+            if (cliente.Puntos > 100)
+                cliente.Puntos = 100;
 
-                // 🔥 VALIDACIÓN PREMIO
-                if (cliente.Puntos >= 100)
-                {
-                    TempData["Mensaje"] = "🎉 ¡Cliente con PREMIO disponible!";
-                }
+            cliente.UltimoEscaneo = DateTime.UtcNow;
 
-                _context.SaveChanges();
-            }
+            _context.SaveChanges();
 
-            return View("ResultadoQR", cliente);
+            return Content($"Puntos agregados correctamente a {cliente.Nombre}. Total actual: {cliente.Puntos}");
         }
 
         [HttpGet]

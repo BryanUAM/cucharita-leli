@@ -32,6 +32,11 @@ app.UseRouting();
 app.UseAuthorization();
 
 app.MapControllerRoute(
+    name: "sumarPuntosQR",
+    pattern: "Clientes/SumarPuntosQR/{id}",
+    defaults: new { controller = "Clientes", action = "SumarPuntosQR" });
+
+app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Clientes}/{action=Dashboard}/{id?}");
 
