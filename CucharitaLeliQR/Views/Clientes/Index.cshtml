@@ -61,7 +61,8 @@
 
                         @if (item.Puntos < 100)
                         {
-                            <button onclick="sumarPuntos(@item.Id)"
+                            <button type="button"
+                                    onclick="sumarPuntos(@item.Id)"
                                     class="btn btn-light btn-lg px-4"
                                     id="btn-sumar-@item.Id">
                                 +20
@@ -69,7 +70,8 @@
                         }
                         else
                         {
-                            <button onclick="entregarPremio(@item.Id)"
+                            <button type="button"
+                                    onclick="entregarPremio(@item.Id)"
                                     class="btn btn-warning btn-lg px-4"
                                     id="btn-premio-@item.Id">
                                 🎁 Premio
@@ -170,7 +172,7 @@
         <h3 id="modalPuntos"></h3>
         <p id="modalMensaje"></p>
 
-        <button onclick="cerrarModal()" class="btn btn-dark mt-3">
+        <button type="button" onclick="cerrarModal()" class="btn btn-dark mt-3">
             Cerrar
         </button>
     </div>
@@ -186,6 +188,11 @@
         fetch(`/Clientes/SumarPuntosAjax?id=${id}`)
             .then(response => response.json())
             .then(data => {
+                if (!data || data.mensaje === "Error") {
+                    alert("No se pudo sumar puntos.");
+                    return;
+                }
+
                 let puntosDiv = document.getElementById("puntos-" + id);
                 puntosDiv.innerText = "⭐ " + data.puntos;
 
@@ -215,11 +222,15 @@
                             ✏ Editar
                         </a>
 
-                        <button onclick="entregarPremio(${id})" class="btn btn-warning btn-lg px-4">
+                        <button type="button"
+                                onclick="entregarPremio(${id})"
+                                class="btn btn-warning btn-lg px-4"
+                                id="btn-premio-${id}">
                             🎁 Premio
                         </button>
 
-                        <a href="/Clientes/Eliminar/${id}" class="btn btn-outline-danger btn-lg px-4"
+                        <a href="/Clientes/Eliminar/${id}"
+                           class="btn btn-outline-danger btn-lg px-4"
                            onclick="return confirm('¿Eliminar cliente?');">
                             🗑
                         </a>
@@ -232,6 +243,10 @@
                 document.getElementById("modalMensaje").innerText = data.mensaje;
 
                 document.getElementById("modalResultado").style.display = "flex";
+            })
+            .catch(error => {
+                console.error("Error en sumarPuntos:", error);
+                alert("Error al sumar puntos.");
             });
     }
 
@@ -239,6 +254,11 @@
         fetch(`/Clientes/EntregarPremioAjax?id=${id}`)
             .then(response => response.json())
             .then(data => {
+                if (!data || data.mensaje === "Error") {
+                    alert("No se pudo entregar el premio.");
+                    return;
+                }
+
                 let premiosDiv = document.getElementById("premios-" + id);
                 if (premiosDiv) {
                     premiosDiv.innerText = "🎁 " + data.premios + " canjeados";
@@ -246,7 +266,6 @@
 
                 document.getElementById("puntos-" + id).innerText = "⭐ 0";
                 document.getElementById("puntos-" + id).style.color = "white";
-
                 document.getElementById("fecha-" + id).innerText = "Último: " + data.fecha;
 
                 let contenedor = document.getElementById("acciones-" + id);
@@ -264,11 +283,15 @@
                         ✏ Editar
                     </a>
 
-                    <button onclick="sumarPuntos(${id})" class="btn btn-light btn-lg px-4">
+                    <button type="button"
+                            onclick="sumarPuntos(${id})"
+                            class="btn btn-light btn-lg px-4"
+                            id="btn-sumar-${id}">
                         +20
                     </button>
 
-                    <a href="/Clientes/Eliminar/${id}" class="btn btn-outline-danger btn-lg px-4"
+                    <a href="/Clientes/Eliminar/${id}"
+                       class="btn btn-outline-danger btn-lg px-4"
                        onclick="return confirm('¿Eliminar cliente?');">
                         🗑
                     </a>
@@ -280,6 +303,10 @@
                 document.getElementById("modalMensaje").innerText = "✅ Todo correcto";
 
                 document.getElementById("modalResultado").style.display = "flex";
+            })
+            .catch(error => {
+                console.error("Error en entregarPremio:", error);
+                alert("Error al entregar premio.");
             });
     }
 

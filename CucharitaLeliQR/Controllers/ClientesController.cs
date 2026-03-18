@@ -135,7 +135,7 @@ namespace CucharitaLeliQR.Controllers
             if (cliente.Puntos > 100)
                 cliente.Puntos = 100;
 
-            cliente.UltimoEscaneo = DateTime.Now;
+            cliente.UltimoEscaneo = DateTime.UtcNow;
 
             _context.SaveChanges();
 
@@ -149,7 +149,7 @@ namespace CucharitaLeliQR.Controllers
             {
                 nombre = cliente.Nombre,
                 puntos = cliente.Puntos,
-                mensaje = mensaje,
+                mensaje,
                 fecha = cliente.UltimoEscaneo?.ToString("dd/MM/yyyy HH:mm")
             });
         }

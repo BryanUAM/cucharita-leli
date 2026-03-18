@@ -106,27 +106,3 @@
 
 </div>
 
-<script>
-    function sumarPuntos(id) {
-        fetch('/Clientes/SumarPuntosAjax?id=' + id)
-            .then(response => response.json())
-            .then(data => {
-                if (data.mensaje === "Error") {
-                    alert("No se pudo sumar puntos.");
-                    return;
-                }
-
-                const btn = document.getElementById("btn-sumar-" + id);
-
-                if (btn && data.puntos >= 100) {
-                    btn.style.display = "none";
-                }
-
-                location.reload();
-            })
-            .catch(error => {
-                console.error("Error:", error);
-                alert("Ocurrió un error al sumar puntos.");
-            });
-    }
-</script>
