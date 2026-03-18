@@ -211,20 +211,13 @@ namespace CucharitaLeliQR.Controllers
         }
         public IActionResult Dashboard()
         {
-            try
-            {
-                var clientes = _context.Clientes.ToList();
+            var clientes = _context.Clientes.ToList();
 
-                ViewBag.TotalClientes = clientes.Count;
-                ViewBag.ClientesConPremio = clientes.Count(c => c.Puntos >= 100);
-                ViewBag.PremiosCanjeados = clientes.Sum(c => c.PremiosCanjeados);
+            ViewBag.TotalClientes = clientes.Count;
+            ViewBag.ClientesConPremio = clientes.Count(c => c.Puntos >= 100);
+            ViewBag.PremiosCanjeados = clientes.Sum(c => c.PremiosCanjeados);
 
-                return View(clientes);
-            }
-            catch (Exception ex)
-            {
-                return Content("ERROR DASHBOARD: " + ex.ToString());
-            }
+            return View(clientes);
         }
 
         public IActionResult Eliminar(int id)
