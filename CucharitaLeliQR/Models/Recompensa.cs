@@ -13,7 +13,7 @@ namespace CucharitaLeliQR.Models
 
         public string Estado { get; set; } = "Activo";
 
-        public DateTime FechaGenerado { get; set; } = DateTime.Now;
+        public DateTime FechaGenerado { get; set; } = DateTime.UtcNow;
 
         public Cliente Cliente { get; set; }
     }

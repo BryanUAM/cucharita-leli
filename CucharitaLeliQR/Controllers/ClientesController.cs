@@ -92,7 +92,7 @@ namespace CucharitaLeliQR.Controllers
             {
                 cliente.Puntos += 20;
 
-                cliente.UltimoEscaneo = DateTime.Now;
+                cliente.UltimoEscaneo = DateTime.UtcNow;
 
                 // 🔥 MENSAJE NORMAL
                 TempData["Mensaje"] = $"+20 puntos agregados";
@@ -166,7 +166,7 @@ namespace CucharitaLeliQR.Controllers
 
             cliente.PremiosCanjeados += 1;
             cliente.Puntos = 0;
-            cliente.UltimoEscaneo = DateTime.Now;
+            cliente.UltimoEscaneo = DateTime.UtcNow;
 
             _context.SaveChanges();
 
