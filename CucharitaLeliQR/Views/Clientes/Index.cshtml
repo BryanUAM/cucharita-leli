@@ -1,14 +1,14 @@
 ﻿@model List<CucharitaLeliQR.Models.Cliente>
 
 <div style="
-    background: url('/Images/restaurant.png?v=2') no-repeat center center;
+    background: url('/Images/restaurant.png?v=2 ') no-repeat center center;
     background-size: cover;
     min-height: 100vh;
 ">
     <div style="
         background: rgba(0,0,0,0.45);
         min-height: 100vh;
-        padding: 30px;
+        padding: 110px 30px 30px 30px;
     ">
         <div style="max-width: 550px; margin:auto; color:white;">
 
@@ -59,13 +59,13 @@
                             ✏ Editar
                         </a>
 
-                        @if (item.Puntos < 100)
+                        @if (item.Puntos < 80)
                         {
                             <button type="button"
                                     onclick="sumarPuntos(@item.Id)"
                                     class="btn btn-light btn-lg px-4"
                                     id="btn-sumar-@item.Id">
-                                +20
+                                +10
                             </button>
                         }
                         else
@@ -204,7 +204,7 @@
                 let fechaTexto = data.fecha ? data.fecha : "Sin escaneos";
                 document.getElementById("fecha-" + id).innerText = "Último: " + fechaTexto;
 
-                if (data.puntos >= 100) {
+                if (data.puntos >= 80) {
                     puntosDiv.style.color = "#d4af37";
 
                     let contenedor = document.getElementById("acciones-" + id);
@@ -237,7 +237,7 @@
                     `;
                 }
 
-                document.getElementById("modalTitulo").innerText = "+20 puntos agregados";
+                document.getElementById("modalTitulo").innerText = "+10 puntos agregados";
                 document.getElementById("modalNombre").innerText = "Cliente: " + data.nombre;
                 document.getElementById("modalPuntos").innerText = "⭐ " + data.puntos;
                 document.getElementById("modalMensaje").innerText = data.mensaje;
@@ -287,7 +287,7 @@
                             onclick="sumarPuntos(${id})"
                             class="btn btn-light btn-lg px-4"
                             id="btn-sumar-${id}">
-                        +20
+                        +10
                     </button>
 
                     <a href="/Clientes/Eliminar/${id}"

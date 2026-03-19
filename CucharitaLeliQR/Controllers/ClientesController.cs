@@ -105,15 +105,15 @@ namespace CucharitaLeliQR.Controllers
                 });
             }
 
-            cliente.Puntos += 20;
+            cliente.Puntos += 10;
 
-            if (cliente.Puntos > 100)
-                cliente.Puntos = 100;
+            if (cliente.Puntos > 80)
+                cliente.Puntos = 80;
 
             cliente.UltimoEscaneo = DateTime.UtcNow;
             _context.SaveChanges();
 
-            int faltan = 100 - cliente.Puntos;
+            int faltan = 80 - cliente.Puntos;
             if (faltan < 0)
                 faltan = 0;
 
@@ -137,7 +137,7 @@ namespace CucharitaLeliQR.Controllers
                 return Json(new { mensaje = "Error" });
             }
 
-            if (cliente.Puntos >= 100)
+            if (cliente.Puntos >= 80)
             {
                 return Json(new
                 {
@@ -148,18 +148,18 @@ namespace CucharitaLeliQR.Controllers
                 });
             }
 
-            cliente.Puntos += 20;
+            cliente.Puntos += 10;
 
-            if (cliente.Puntos > 100)
-                cliente.Puntos = 100;
+            if (cliente.Puntos > 80)
+                cliente.Puntos = 80;
 
             cliente.UltimoEscaneo = DateTime.UtcNow;
 
             _context.SaveChanges();
 
-            int faltan = 100 - cliente.Puntos;
+            int faltan = 80 - cliente.Puntos;
 
-            string mensaje = cliente.Puntos >= 100
+            string mensaje = cliente.Puntos >= 80
                 ? "🎁 ¡Premio disponible!"
                 : $"Te faltan {faltan} puntos para premio";
 
@@ -232,7 +232,7 @@ namespace CucharitaLeliQR.Controllers
             var clientes = _context.Clientes.ToList();
 
             ViewBag.TotalClientes = clientes.Count;
-            ViewBag.ClientesConPremio = clientes.Count(c => c.Puntos >= 100);
+            ViewBag.ClientesConPremio = clientes.Count(c => c.Puntos >= 80);
             ViewBag.PremiosCanjeados = clientes.Sum(c => c.PremiosCanjeados);
 
             return View(clientes);
