@@ -1,4 +1,5 @@
-﻿using CucharitaLeliQR.Data;
+﻿using Microsoft.AspNetCore.Authorization;
+using CucharitaLeliQR.Data;
 using CucharitaLeliQR.Models;
 using Microsoft.AspNetCore.Mvc;
 using QRCoder;
@@ -7,6 +8,7 @@ using System.IO;
 
 namespace CucharitaLeliQR.Controllers
 {
+    [Authorize]
     public class ClientesController : Controller
     {
         private readonly SodaContext _context;

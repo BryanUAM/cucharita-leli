@@ -1,8 +1,10 @@
-﻿using System;
+﻿using Microsoft.AspNetCore.Authorization;
+using System;
 using System.ComponentModel.DataAnnotations;
 
 namespace CucharitaLeliQR.Models
 {
+    [Authorize]
     public class Recompensa
     {
         public int Id { get; set; }

@@ -11,8 +11,11 @@ namespace CucharitaLeliQR.Data
         }
 
         public DbSet<Cliente> Clientes { get; set; }
+
         public DbSet<Recompensa> Recompensas { get; set; }
 
         public DbSet<Movimiento> Movimientos { get; set; }
+
+        public DbSet<Admin> Admins { get; set; }
     }
 }

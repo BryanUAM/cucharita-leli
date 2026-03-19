@@ -1,6 +1,10 @@
 using CucharitaLeliQR.Data;
+using CucharitaLeliQR.Helpers;
+using CucharitaLeliQR.Models;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.EntityFrameworkCore;
+
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -8,6 +12,16 @@ builder.Services.AddControllersWithViews();
 
 builder.Services.AddDbContext<SodaContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
+
+builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+    .AddCookie(options =>
+    {
+        options.LoginPath = "/Login/Index";
+        options.AccessDeniedPath = "/Login/Index";
+        options.ExpireTimeSpan = TimeSpan.FromHours(8);
+    });
+
+builder.Services.AddAuthorization();
 
 var app = builder.Build();
 
@@ -29,6 +43,8 @@ if (!app.Environment.IsDevelopment())
 
 app.UseStaticFiles();
 app.UseRouting();
+
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllerRoute(
@@ -38,6 +54,22 @@ app.MapControllerRoute(
 
 app.MapControllerRoute(
     name: "default",
-    pattern: "{controller=Clientes}/{action=Dashboard}/{id?}");
+    pattern: "{controller=Login}/{action=Index}/{id?}");
+
+using (var scope = app.Services.CreateScope())
+{
+    var context = scope.ServiceProvider.GetRequiredService<SodaContext>();
+
+    if (!context.Admins.Any())
+    {
+        context.Admins.Add(new Admin
+        {
+            Usuario = "admin",
+            PasswordHash = PasswordHelper.HashPassword("Leli2026!")
+        });
+
+        context.SaveChanges();
+    }
+}
 
 app.Run();
