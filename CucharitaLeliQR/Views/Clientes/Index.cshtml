@@ -181,7 +181,7 @@
 <script>
     function mostrarQR(id, nombre) {
         document.getElementById("nombreClienteQR").innerText = nombre;
-        document.getElementById("imagenQR").src = '/Clientes/GenerarQR/' + id;
+        document.getElementById("imagenQR").src = '/Clientes/GenerarQR/' + id + '?t=' + new Date().getTime();;
     }
 
     function sumarPuntos(id) {
