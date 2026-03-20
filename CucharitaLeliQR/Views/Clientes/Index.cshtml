@@ -14,10 +14,32 @@
 
             <h3 class="text-center mb-4">Clientes</h3>
 
+            <!-- BUSCADOR -->
+            <div class="mb-4">
+                <input type="text"
+                       id="buscadorClientes"
+                       class="form-control form-control-lg rounded-pill"
+                       placeholder="Buscar cliente por nombre..."
+                       style="
+                            background: rgba(255,255,255,0.12);
+                            color: white;
+                            border: 1px solid rgba(255,255,255,0.25);
+                            backdrop-filter: blur(10px);
+                            box-shadow: none;
+                       " />
+            </div>
+
+            <div id="mensajeSinResultados"
+                 class="text-center mb-3"
+                 style="display:none; color:#f5d76e; font-size:15px;">
+                No se encontraron clientes con ese nombre.
+            </div>
+
             @foreach (var item in Model)
             {
                 <div id="cliente-@item.Id"
-                     class="mb-4 p-4 rounded-4"
+                     class="cliente-card mb-4 p-4 rounded-4"
+                     data-nombre="@item.Nombre"
                      style="background: rgba(255,255,255,0.12); backdrop-filter: blur(12px);">
 
                     <div class="d-flex justify-content-between align-items-center">
@@ -181,7 +203,7 @@
 <script>
     function mostrarQR(id, nombre) {
         document.getElementById("nombreClienteQR").innerText = nombre;
-        document.getElementById("imagenQR").src = '/Clientes/GenerarQR/' + id + '?t=' + new Date().getTime();;
+        document.getElementById("imagenQR").src = '/Clientes/GenerarQR/' + id + '?t=' + new Date().getTime();
     }
 
     function sumarPuntos(id) {
@@ -313,4 +335,31 @@
     function cerrarModal() {
         document.getElementById("modalResultado").style.display = "none";
     }
+
+    // BUSCADOR DE CLIENTES
+    const buscadorClientes = document.getElementById("buscadorClientes");
+    const tarjetasClientes = document.querySelectorAll(".cliente-card");
+    const mensajeSinResultados = document.getElementById("mensajeSinResultados");
+
+    buscadorClientes.addEventListener("keyup", function () {
+        const texto = buscadorClientes.value.toLowerCase().trim();
+        let encontrados = 0;
+
+        tarjetasClientes.forEach(tarjeta => {
+            const nombre = tarjeta.getAttribute("data-nombre").toLowerCase();
+
+            if (nombre.startsWith(texto)) {
+                tarjeta.style.display = "block";
+                encontrados++;
+            } else {
+                tarjeta.style.display = "none";
+            }
+        });
+
+        if (encontrados === 0) {
+            mensajeSinResultados.style.display = "block";
+        } else {
+            mensajeSinResultados.style.display = "none";
+        }
+    });
 </script>
