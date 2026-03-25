@@ -39,10 +39,18 @@ namespace CucharitaLeliQR.Controllers
             return View();
         }
 
-        private DateTime ObtenerHoraCostaRica()
+        private DateTime ConvertirAHoraCostaRica(DateTime fechaUtc)
         {
-            var zonaCR = TimeZoneInfo.FindSystemTimeZoneById("Central America Standard Time");
-            return TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, zonaCR);
+            try
+            {
+                var zonaCR = TimeZoneInfo.FindSystemTimeZoneById("Central America Standard Time");
+                return TimeZoneInfo.ConvertTimeFromUtc(DateTime.SpecifyKind(fechaUtc, DateTimeKind.Utc), zonaCR);
+            }
+            catch
+            {
+                var zonaCR = TimeZoneInfo.FindSystemTimeZoneById("America/Costa_Rica");
+                return TimeZoneInfo.ConvertTimeFromUtc(DateTime.SpecifyKind(fechaUtc, DateTimeKind.Utc), zonaCR);
+            }
         }
 
         [HttpPost]
@@ -116,7 +124,7 @@ namespace CucharitaLeliQR.Controllers
             if (cliente.Puntos > 80)
                 cliente.Puntos = 80;
 
-            cliente.UltimoEscaneo = ObtenerHoraCostaRica();
+            cliente.UltimoEscaneo = DateTime.UtcNow;
             _context.SaveChanges();
 
             int faltan = 80 - cliente.Puntos;
@@ -150,7 +158,9 @@ namespace CucharitaLeliQR.Controllers
                     nombre = cliente.Nombre,
                     puntos = cliente.Puntos,
                     mensaje = "🎁 Ya tiene un premio pendiente",
-                    fecha = cliente.UltimoEscaneo?.ToString("dd/MM/yyyy HH:mm")
+                    fecha = cliente.UltimoEscaneo.HasValue
+    ? ConvertirAHoraCostaRica(cliente.UltimoEscaneo.Value).ToString("dd/MM/yyyy HH:mm")
+    : ""
                 });
             }
 
@@ -159,7 +169,7 @@ namespace CucharitaLeliQR.Controllers
             if (cliente.Puntos > 80)
                 cliente.Puntos = 80;
 
-            cliente.UltimoEscaneo = ObtenerHoraCostaRica();
+            cliente.UltimoEscaneo = DateTime.UtcNow;
 
             _context.SaveChanges();
 
@@ -174,7 +184,9 @@ namespace CucharitaLeliQR.Controllers
                 nombre = cliente.Nombre,
                 puntos = cliente.Puntos,
                 mensaje,
-                fecha = cliente.UltimoEscaneo?.ToString("dd/MM/yyyy HH:mm")
+                fecha = cliente.UltimoEscaneo.HasValue
+    ? ConvertirAHoraCostaRica(cliente.UltimoEscaneo.Value).ToString("dd/MM/yyyy HH:mm")
+    : ""
             });
         }
 
@@ -190,14 +202,16 @@ namespace CucharitaLeliQR.Controllers
 
             cliente.PremiosCanjeados += 1;
             cliente.Puntos = 0;
-            cliente.UltimoEscaneo = ObtenerHoraCostaRica();
+            cliente.UltimoEscaneo = DateTime.UtcNow;
 
             _context.SaveChanges();
 
             return Json(new
             {
                 nombre = cliente.Nombre,
-                fecha = cliente.UltimoEscaneo?.ToString("dd/MM/yyyy HH:mm"),
+                fecha = cliente.UltimoEscaneo.HasValue
+    ? ConvertirAHoraCostaRica(cliente.UltimoEscaneo.Value).ToString("dd/MM/yyyy HH:mm")
+    : "",
                 premios = cliente.PremiosCanjeados
             });
         }

@@ -10,7 +10,7 @@ namespace CucharitaLeliQR.Models
 
         public int Puntos { get; set; }
 
-        public DateTime Fecha { get; set; } = DateTime.Now;
+        public DateTime Fecha { get; set; } = DateTime.UtcNow;
 
         public Cliente Cliente { get; set; }
     }
