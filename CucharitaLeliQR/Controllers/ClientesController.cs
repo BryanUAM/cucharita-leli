@@ -39,6 +39,12 @@ namespace CucharitaLeliQR.Controllers
             return View();
         }
 
+        private DateTime ObtenerHoraCostaRica()
+        {
+            var zonaCR = TimeZoneInfo.FindSystemTimeZoneById("Central America Standard Time");
+            return TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, zonaCR);
+        }
+
         [HttpPost]
         [ValidateAntiForgeryToken]
         public IActionResult Create(Cliente cliente)
@@ -110,7 +116,7 @@ namespace CucharitaLeliQR.Controllers
             if (cliente.Puntos > 80)
                 cliente.Puntos = 80;
 
-            cliente.UltimoEscaneo = DateTime.UtcNow;
+            cliente.UltimoEscaneo = ObtenerHoraCostaRica();
             _context.SaveChanges();
 
             int faltan = 80 - cliente.Puntos;
@@ -153,7 +159,7 @@ namespace CucharitaLeliQR.Controllers
             if (cliente.Puntos > 80)
                 cliente.Puntos = 80;
 
-            cliente.UltimoEscaneo = DateTime.UtcNow;
+            cliente.UltimoEscaneo = ObtenerHoraCostaRica();
 
             _context.SaveChanges();
 
@@ -184,7 +190,7 @@ namespace CucharitaLeliQR.Controllers
 
             cliente.PremiosCanjeados += 1;
             cliente.Puntos = 0;
-            cliente.UltimoEscaneo = DateTime.UtcNow;
+            cliente.UltimoEscaneo = ObtenerHoraCostaRica();
 
             _context.SaveChanges();
 
