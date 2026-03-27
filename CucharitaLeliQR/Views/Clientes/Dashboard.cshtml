@@ -12,7 +12,6 @@
 
         <div style="max-width: 500px; margin: auto; color: white;">
 
-       
             <div class="mb-3 p-3 rounded-4 d-flex justify-content-between align-items-center"
                  style="
                     background: rgba(255,255,255,0.08);
@@ -31,45 +30,37 @@
                 <div style="font-size:26px;">👥</div>
             </div>
 
-            <div class="mb-3 p-3 rounded-4 d-flex justify-content-between align-items-center"
-                 style="
-                    background: rgba(255,255,255,0.08);
-                    border: 1px solid rgba(255,255,255,0.15);
-                    backdrop-filter: blur(6px);
-                    max-width: 360px;
-                    margin: 0 auto;
-                 ">
-                <a asp-controller="Clientes" asp-action="ClientesConPremio"
-                   class="mb-3 d-block text-decoration-none"
-                   style="max-width: 360px; margin: 0 auto;">
-                    <div class="p-3 rounded-4 text-white text-center card-premio"
-                         style="
+            <a href="/Clientes/ClientesConPremio"
+               class="mb-3 d-block text-decoration-none"
+               style="max-width: 360px; margin: 0 auto;">
+
+                <div class="p-3 rounded-4 text-white text-center"
+                     style="
             background: rgba(255,255,255,0.08);
             border: 1px solid rgba(255,255,255,0.15);
             backdrop-filter: blur(6px);
+            transition: 0.3s;
          ">
-                        <h5 class="mb-2">🎁 Premios para canjear</h5>
-                        <h2 class="fw-bold">@ViewBag.ClientesConPremio</h2>
-                        <div style="margin-top:12px;">
-                            <span style="
-        display:inline-block;
-        background: rgba(255,255,255,0.22);
-        color: white;
-        padding: 8px 16px;
-        border-radius: 999px;
-        font-size: 14px;
-        font-weight: 600;
-        border: 1px solid rgba(255,255,255,0.35);
-        box-shadow: 0 4px 12px rgba(0,0,0,0.20);
-    ">
-                                Ver clientes con premio
-                            </span>
-                        </div>
-                    </div>
-                </a>
+                    <h5 class="mb-2">🎁 Premios para canjear</h5>
+                    <h2 class="fw-bold">@ViewBag.ClientesConPremio</h2>
 
-                <div style="font-size:26px;">🎁</div>
-            </div>
+                    <div style="margin-top:12px;">
+                        <span style="
+                display:inline-block;
+                background: rgba(255,255,255,0.15);
+                color: white;
+                padding: 8px 16px;
+                border-radius: 999px;
+                font-size: 14px;
+                font-weight: 600;
+                border: 1px solid rgba(255,255,255,0.25);
+            ">
+                            Ver clientes con premio
+                        </span>
+                    </div>
+                </div>
+
+            </a>
 
             <div class="mb-3 p-3 rounded-4 d-flex justify-content-between align-items-center"
                  style="
@@ -90,19 +81,19 @@
             </div>
 
             <div class="d-grid gap-3">
-                <a asp-action="Create"
+                <a href="/Clientes/Create"
                    class="btn btn-light btn-lg rounded-pill"
                    style="font-weight:600; padding:15px;">
                     Nuevo cliente
                 </a>
 
-                <a asp-action="Index"
+                <a href="/Clientes/Index"
                    class="btn btn-outline-light btn-lg rounded-pill"
                    style="padding:15px;">
                     Ver clientes
                 </a>
 
-                <a asp-controller="Clientes" asp-action="EscanearQR"
+                <a href="/Clientes/EscanearQR"
                    style="
                         display:block;
                         text-align:center;
