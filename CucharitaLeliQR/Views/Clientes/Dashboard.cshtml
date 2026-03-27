@@ -39,14 +39,19 @@
                     max-width: 360px;
                     margin: 0 auto;
                  ">
-                <a asp-controller="Clientes" asp-action="ClientesConPremio" style="text-decoration:none;">
-
-                    <div class="card-premio shadow-lg rounded-4 text-white text-center p-4">
+                <a asp-controller="Clientes" asp-action="ClientesConPremio"
+                   class="mb-3 d-block text-decoration-none"
+                   style="max-width: 360px; margin: 0 auto;">
+                    <div class="p-3 rounded-4 text-white text-center card-premio"
+                         style="
+            background: rgba(255,255,255,0.08);
+            border: 1px solid rgba(255,255,255,0.15);
+            backdrop-filter: blur(6px);
+         ">
                         <h5 class="mb-2">🎁 Premios para canjear</h5>
                         <h2 class="fw-bold">@ViewBag.ClientesConPremio</h2>
                         <p class="mb-0">Ver clientes con premio disponible</p>
                     </div>
-
                 </a>
 
                 <div style="font-size:26px;">🎁</div>
