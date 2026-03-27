@@ -275,5 +275,14 @@ namespace CucharitaLeliQR.Controllers
         {
             return View();
         }
+
+        public IActionResult ClientesConPremio()
+        {
+            var clientesConPremio = _context.Clientes
+                .Where(c => c.Puntos >= 80)
+                .ToList();
+
+            return View(clientesConPremio);
+        }
     }
 }

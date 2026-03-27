@@ -1,0 +1,65 @@
+﻿@model List<CucharitaLeliQR.Models.Cliente>
+
+@{
+    ViewData["Title"] = "Clientes con premio";
+}
+
+<div style="
+    background: url('/Images/restaurante.png') no-repeat center center fixed;
+    background-size: cover;
+    min-height: 100vh;
+    padding: 110px 20px 30px 20px;
+">
+    <div style="
+        background: rgba(0,0,0,0.55);
+        min-height: 100vh;
+        padding: 30px;
+        border-radius: 20px;
+    ">
+
+        <div class="container">
+            <div class="text-center mb-4">
+                <h2 style="color:white; font-weight:bold;">🎁 Clientes con premio disponible</h2>
+                <p style="color:#ddd;">Aquí se muestran los clientes que ya pueden canjear premio.</p>
+            </div>
+
+            @if (Model != null && Model.Count > 0)
+            {
+                <div class="row g-4">
+                    @foreach (var item in Model)
+                    {
+                        <div class="col-md-6 col-lg-4">
+                            <div class="card border-0 shadow-lg rounded-4 h-100"
+                                 style="background: rgba(255,255,255,0.10); backdrop-filter: blur(8px); color:white;">
+                                <div class="card-body text-center p-4">
+                                    <h4 class="fw-bold mb-3">@item.Nombre</h4>
+                                    <p class="mb-2"><strong>Puntos:</strong> @item.Puntos</p>
+                                    <p class="mb-3"><strong>Premios canjeados:</strong> @item.PremiosCanjeados</p>
+
+                                    <a asp-controller="Clientes" asp-action="CanjearPremio" asp-route-id="@item.Id"
+                                       class="btn btn-warning rounded-pill px-4 fw-bold">
+                                        Canjear premio
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            }
+            else
+            {
+                <div class="alert alert-light text-center rounded-4 shadow-sm">
+                    No hay clientes con premio disponible en este momento.
+                </div>
+            }
+
+            <div class="text-center mt-4">
+                <a asp-controller="Clientes" asp-action="Dashboard" class="btn btn-light rounded-pill px-4">
+                    Volver al Menú principal
+                </a>
+            </div>
+        </div>
+
+    </div>
+</div>
+

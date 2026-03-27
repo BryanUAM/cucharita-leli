@@ -29,3 +29,41 @@ body {
 .form-floating > .form-control-plaintext:focus::placeholder, .form-floating > .form-control:focus::placeholder {
   text-align: start;
 }
+
+.card-premio {
+    background: linear-gradient(135deg, #198754, #146c43);
+    cursor: pointer;
+    transition: all 0.35s ease;
+    border: none;
+    position: relative;
+    overflow: hidden;
+}
+
+    /* ✨ Efecto brillo */
+    .card-premio::before {
+        content: "";
+        position: absolute;
+        top: -50%;
+        left: -75%;
+        width: 50%;
+        height: 200%;
+        background: rgba(255,255,255,0.15);
+        transform: rotate(25deg);
+        transition: all 0.5s ease;
+    }
+
+    /* 🟢 Hover */
+    .card-premio:hover {
+        transform: translateY(-8px) scale(1.02);
+        box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+    }
+
+        /* ✨ Movimiento del brillo */
+        .card-premio:hover::before {
+            left: 130%;
+        }
+
+    /* 💡 Cambio de color suave */
+    .card-premio:hover {
+        background: linear-gradient(135deg, #20c997, #198754);
+    }
