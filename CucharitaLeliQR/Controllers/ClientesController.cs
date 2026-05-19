@@ -284,5 +284,32 @@ namespace CucharitaLeliQR.Controllers
 
             return View(clientesConPremio);
         }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult CanjearPremio(int id)
+        {
+            var cliente = _context.Clientes.FirstOrDefault(c => c.Id == id);
+
+            if (cliente == null)
+            {
+                return NotFound();
+            }
+
+            if (cliente.Puntos < 80)
+            {
+                TempData["Error"] = "Este cliente todavía no tiene premio disponible.";
+                return RedirectToAction("ClientesConPremio");
+            }
+
+            cliente.PremiosCanjeados += 1;
+            cliente.Puntos = 0;
+            cliente.UltimoEscaneo = DateTime.UtcNow;
+
+            _context.SaveChanges();
+
+            TempData["Exito"] = "Premio entregado correctamente.";
+            return RedirectToAction("ClientesConPremio");
+        }
     }
 }
