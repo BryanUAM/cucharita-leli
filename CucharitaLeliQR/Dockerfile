@@ -1,15 +1,15 @@
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 WORKDIR /src
 
-COPY ["CucharitaLeliQR/CucharitaLeliQR.csproj", "CucharitaLeliQR/"]
-RUN dotnet restore "CucharitaLeliQR/CucharitaLeliQR.csproj"
+COPY CucharitaLeliQR.csproj .
+RUN dotnet restore CucharitaLeliQR.csproj
 
 COPY . .
-WORKDIR /src/CucharitaLeliQR
-RUN dotnet publish "CucharitaLeliQR.csproj" -c Release -o /app/publish /p:UseAppHost=false
+RUN dotnet publish CucharitaLeliQR.csproj -c Release -o /app/publish /p:UseAppHost=false
 
 FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS final
 WORKDIR /app
+
 COPY --from=build /app/publish .
 
 ENV ASPNETCORE_URLS=http://+:8080
