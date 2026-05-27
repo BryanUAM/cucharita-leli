@@ -5,7 +5,7 @@
     background-size: cover;
     background-position: center;
     min-height: 100vh;
-">
+    ">
 
     <!-- OVERLAY OSCURO -->
     <div style="
@@ -15,7 +15,7 @@
         display: flex;
         align-items: center;
         justify-content: center;
-    ">
+        ">
 
         <!-- TARJETA MÁS GRANDE -->
         <div style="
@@ -26,7 +26,7 @@
             border-radius: 20px;
             padding: 35px;
             color: white;
-        ">
+            ">
 
             <!-- TÍTULO MÁS GRANDE -->
             <h3 class="text-center mb-4" style="font-weight:700;">
@@ -45,6 +45,17 @@
                            class="form-control form-control-lg"
                            placeholder="Ej: Juan Pérez"
                            style="border-radius:12px;" />
+                    <span asp-validation-for="Nombre" class="text-danger"></span>
+                </div>
+
+                <!-- TELÉFONO -->
+                <div class="mb-4">
+                    <label class="form-label" style="font-size:16px;">Teléfono</label>
+                    <input asp-for="Telefono"
+                           class="form-control form-control-lg"
+                           placeholder="Ej: 88888888"
+                           style="border-radius:12px;" />
+                    <span asp-validation-for="Telefono" class="text-danger"></span>
                 </div>
 
                 <!-- BOTÓN GUARDAR MÁS GRANDE -->

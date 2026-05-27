@@ -1,0 +1,123 @@
+﻿@model CucharitaLeliQR.Models.Cliente
+
+@{
+    Layout = null;
+    ViewData["Title"] = "Código QR";
+}
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Código QR - Cucharita de Leli</title>
+
+    <style>
+            body {
+                margin: 0;
+                font-family: Arial, sans-serif;
+                background-image: url('/Images/restaurante.png');
+                background-size: cover;
+                background-position: center;
+                min-height: 100vh;
+            }
+
+            .overlay {
+                background: rgba(0,0,0,0.78);
+                min-height: 100vh;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                padding: 25px;
+            }
+
+            .card-qr {
+                width: 100%;
+                max-width: 430px;
+                background: rgba(255,255,255,0.13);
+                backdrop-filter: blur(12px);
+                border-radius: 22px;
+                padding: 35px 25px;
+                text-align: center;
+                color: white;
+                box-shadow: 0 12px 35px rgba(0,0,0,0.45);
+            }
+
+            .titulo {
+                font-size: 30px;
+                font-weight: 800;
+                margin-bottom: 8px;
+            }
+
+            .subtitulo {
+                color: #facc15;
+                font-size: 18px;
+                margin-bottom: 25px;
+            }
+
+            .nombre {
+                font-size: 22px;
+                font-weight: bold;
+                margin-bottom: 20px;
+            }
+
+            .qr-box {
+                background: white;
+                display: inline-block;
+                padding: 15px;
+                border-radius: 20px;
+                margin-bottom: 25px;
+            }
+
+                .qr-box img {
+                    width: 220px;
+                    height: 220px;
+                }
+
+            .texto {
+                font-size: 16px;
+                line-height: 1.5;
+            }
+
+            .puntos {
+                margin-top: 18px;
+                font-size: 21px;
+                color: #facc15;
+                font-weight: bold;
+            }
+
+            .footer {
+                margin-top: 20px;
+                font-size: 13px;
+                opacity: 0.75;
+            }
+    </style>
+</head>
+<body>
+    <div class="overlay">
+        <div class="card-qr">
+            <div class="titulo">Cucharita de Leli</div>
+            <div class="subtitulo">Código QR de cliente</div>
+
+            <div class="nombre">@Model.Nombre</div>
+
+            <div class="qr-box">
+                <img src="@Url.Action("GenerarQR", "Clientes", new { id = Model.Id })"
+                     alt="Código QR" />
+            </div>
+
+            <div class="texto">
+                Presentá este código QR en la soda para acumular tus puntos.
+            </div>
+
+            <div class="puntos">
+                Puntos actuales: @Model.Puntos
+            </div>
+
+            <div class="footer">
+                Este código es personal y pertenece únicamente a este cliente.
+            </div>
+        </div>
+    </div>
+</body>
+</html>

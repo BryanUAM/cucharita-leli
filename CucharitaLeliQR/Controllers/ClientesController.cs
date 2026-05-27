@@ -3,8 +3,6 @@ using CucharitaLeliQR.Data;
 using CucharitaLeliQR.Models;
 using Microsoft.AspNetCore.Mvc;
 using QRCoder;
-using System.Drawing;
-using System.IO;
 
 namespace CucharitaLeliQR.Controllers
 {
@@ -12,10 +10,12 @@ namespace CucharitaLeliQR.Controllers
     public class ClientesController : Controller
     {
         private readonly SodaContext _context;
+        private readonly IConfiguration _configuration;
 
-        public ClientesController(SodaContext context)
+        public ClientesController(SodaContext context, IConfiguration configuration)
         {
             _context = context;
+            _configuration = configuration;
         }
 
         public IActionResult Index()
@@ -61,14 +61,16 @@ namespace CucharitaLeliQR.Controllers
             {
                 foreach (var error in ModelState.Values.SelectMany(v => v.Errors))
                 {
-                    Console.WriteLine(error.ErrorMessage); // 🔥 DEBUG
+                    Console.WriteLine(error.ErrorMessage);
                 }
             }
 
             if (ModelState.IsValid)
             {
                 cliente.Puntos = 0;
+                cliente.PremiosCanjeados = 0;
                 cliente.CodigoQR = Guid.NewGuid().ToString();
+                cliente.UltimoEscaneo = null;
 
                 _context.Clientes.Add(cliente);
                 _context.SaveChanges();
@@ -91,6 +93,7 @@ namespace CucharitaLeliQR.Controllers
                     return NotFound();
 
                 clienteDB.Nombre = cliente.Nombre;
+                clienteDB.Telefono = cliente.Telefono;
 
                 _context.SaveChanges();
 
@@ -128,6 +131,7 @@ namespace CucharitaLeliQR.Controllers
             _context.SaveChanges();
 
             int faltan = 80 - cliente.Puntos;
+
             if (faltan < 0)
                 faltan = 0;
 
@@ -159,8 +163,8 @@ namespace CucharitaLeliQR.Controllers
                     puntos = cliente.Puntos,
                     mensaje = "🎁 Ya tiene un premio pendiente",
                     fecha = cliente.UltimoEscaneo.HasValue
-    ? ConvertirAHoraCostaRica(cliente.UltimoEscaneo.Value).ToString("dd/MM/yyyy HH:mm")
-    : ""
+                        ? ConvertirAHoraCostaRica(cliente.UltimoEscaneo.Value).ToString("dd/MM/yyyy HH:mm")
+                        : ""
                 });
             }
 
@@ -185,8 +189,8 @@ namespace CucharitaLeliQR.Controllers
                 puntos = cliente.Puntos,
                 mensaje,
                 fecha = cliente.UltimoEscaneo.HasValue
-    ? ConvertirAHoraCostaRica(cliente.UltimoEscaneo.Value).ToString("dd/MM/yyyy HH:mm")
-    : ""
+                    ? ConvertirAHoraCostaRica(cliente.UltimoEscaneo.Value).ToString("dd/MM/yyyy HH:mm")
+                    : ""
             });
         }
 
@@ -210,12 +214,13 @@ namespace CucharitaLeliQR.Controllers
             {
                 nombre = cliente.Nombre,
                 fecha = cliente.UltimoEscaneo.HasValue
-    ? ConvertirAHoraCostaRica(cliente.UltimoEscaneo.Value).ToString("dd/MM/yyyy HH:mm")
-    : "",
+                    ? ConvertirAHoraCostaRica(cliente.UltimoEscaneo.Value).ToString("dd/MM/yyyy HH:mm")
+                    : "",
                 premios = cliente.PremiosCanjeados
             });
         }
 
+        [AllowAnonymous]
         public IActionResult GenerarQR(int id)
         {
             try
@@ -247,6 +252,73 @@ namespace CucharitaLeliQR.Controllers
                 return Content("ERROR REAL: " + ex.ToString());
             }
         }
+
+        [AllowAnonymous]
+        public IActionResult VerQRCliente(int id)
+        {
+            var cliente = _context.Clientes.Find(id);
+
+            if (cliente == null)
+                return NotFound();
+
+            if (string.IsNullOrEmpty(cliente.CodigoQR))
+            {
+                cliente.CodigoQR = Guid.NewGuid().ToString();
+                _context.SaveChanges();
+            }
+
+            return View(cliente);
+        }
+
+        public IActionResult EnviarQRWhatsApp(int id)
+        {
+            var cliente = _context.Clientes.Find(id);
+
+            if (cliente == null)
+                return NotFound();
+
+            if (string.IsNullOrWhiteSpace(cliente.Telefono))
+            {
+                TempData["Error"] = "El cliente no tiene número de teléfono registrado.";
+                return RedirectToAction("Index");
+            }
+
+            if (string.IsNullOrEmpty(cliente.CodigoQR))
+            {
+                cliente.CodigoQR = Guid.NewGuid().ToString();
+                _context.SaveChanges();
+            }
+
+            string telefono = cliente.Telefono
+                .Replace(" ", "")
+                .Replace("-", "")
+                .Replace("+", "")
+                .Replace("(", "")
+                .Replace(")", "");
+
+            if (!telefono.StartsWith("506"))
+            {
+                telefono = "506" + telefono;
+            }
+
+            string urlPublica = _configuration["AppSettings:UrlPublica"];
+
+            if (string.IsNullOrWhiteSpace(urlPublica))
+            {
+                urlPublica = $"{Request.Scheme}://{Request.Host}";
+            }
+
+            urlPublica = urlPublica.TrimEnd('/');
+
+            string enlaceQR = $"{urlPublica}/Clientes/VerQRCliente/{cliente.Id}";
+
+            string mensaje = $"Hola {cliente.Nombre}, este es tu código QR del programa de puntos de Cucharita de Leli: {enlaceQR}";
+
+            string urlWhatsApp = $"https://wa.me/{telefono}?text={Uri.EscapeDataString(mensaje)}";
+
+            return Redirect(urlWhatsApp);
+        }
+
         public IActionResult Dashboard()
         {
             var clientes = _context.Clientes.ToList();

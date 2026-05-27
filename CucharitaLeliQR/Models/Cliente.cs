@@ -14,5 +14,7 @@ namespace CucharitaLeliQR.Models
         public int PremiosCanjeados { get; set; } = 0;
 
         public DateTime? UltimoEscaneo { get; set; }
+
+        public string? Telefono { get; set; }
     }
 }

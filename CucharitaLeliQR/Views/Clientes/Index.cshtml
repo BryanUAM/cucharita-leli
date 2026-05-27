@@ -1,34 +1,39 @@
 ﻿@model List<CucharitaLeliQR.Models.Cliente>
 
 <div style="
-    background: url('/Images/restaurante.png?v=3 ') no-repeat center center;
+    background: url('/Images/restaurante.png?v=3') no-repeat center center;
     background-size: cover;
     background-attachment: fixed;
     min-height: 100vh;
-">
+    ">
     <div style="
         background: rgba(0,0,0,0.45);
         min-height: 100vh;
         padding: 110px 30px 30px 30px;
-    ">
+        ">
         <div style="max-width: 550px; margin:auto; color:white;">
 
             <h3 class="text-center mb-4">Clientes</h3>
 
-            <!-- BUSCADOR -->
+            @if (TempData["Error"] != null)
+            {
+                <div class="alert alert-warning text-center rounded-4">
+                    @TempData["Error"]
+                </div>
+            }
+
             <div class="mb-4">
                 <input type="text"
                        id="buscadorClientes"
                        class="form-control form-control-lg rounded-pill"
                        placeholder="Buscar cliente por nombre..."
                        style="
-                    style="
-                       background: rgba(255,255,255,0.85);
-                       color: #000;
-                       border: 1px solid rgba(0,0,0,0.1);
-                       backdrop-filter: blur(10px);
-                       box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-                       "  />
+                background: rgba(255,255,255,0.85);
+                color: #000;
+                border: 1px solid rgba(0,0,0,0.1);
+                backdrop-filter: blur(10px);
+                box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+                " />
             </div>
 
             <div id="mensajeSinResultados"
@@ -76,6 +81,11 @@
                                 onclick="mostrarQR(@item.Id, '@item.Nombre')">
                             Ver QR
                         </button>
+
+                        <a href="/Clientes/EnviarQRWhatsApp/@item.Id"
+                           class="btn btn-success btn-sm">
+                            Enviar WhatsApp
+                        </a>
 
                         <a href="/Clientes/Edit/@item.Id"
                            class="btn btn-outline-warning btn-lg px-4">
@@ -145,7 +155,7 @@
                     padding:18px;
                     display:inline-block;
                     box-shadow: 0 8px 20px rgba(0,0,0,0.35);
-                ">
+                    ">
                     <img id="imagenQR"
                          src=""
                          alt="Código QR del cliente"
@@ -180,7 +190,7 @@
     z-index:9999;
     justify-content:center;
     align-items:center;
-">
+    ">
     <div style="
         background:white;
         border-radius:20px;
@@ -188,7 +198,7 @@
         width:90%;
         max-width:400px;
         text-align:center;
-    ">
+        ">
         <h2 id="modalTitulo" style="color:green;">Resultado</h2>
         <h4 id="modalNombre"></h4>
         <h3 id="modalPuntos"></h3>
@@ -240,6 +250,11 @@
                             Ver QR
                         </button>
 
+                        <a href="/Clientes/EnviarQRWhatsApp/${id}"
+                           class="btn btn-success btn-sm">
+                            Enviar WhatsApp
+                        </a>
+
                         <a href="/Clientes/Edit/${id}" class="btn btn-outline-warning btn-lg px-4">
                             ✏ Editar
                         </a>
@@ -282,6 +297,7 @@
                 }
 
                 let premiosDiv = document.getElementById("premios-" + id);
+
                 if (premiosDiv) {
                     premiosDiv.innerText = "🎁 " + data.premios + " canjeados";
                 }
@@ -300,6 +316,11 @@
                             onclick="mostrarQR(${id}, '${data.nombre}')">
                         Ver QR
                     </button>
+
+                    <a href="/Clientes/EnviarQRWhatsApp/${id}"
+                       class="btn btn-success btn-sm">
+                        Enviar WhatsApp
+                    </a>
 
                     <a href="/Clientes/Edit/${id}" class="btn btn-outline-warning btn-lg px-4">
                         ✏ Editar
@@ -336,7 +357,6 @@
         document.getElementById("modalResultado").style.display = "none";
     }
 
-    // BUSCADOR DE CLIENTES
     const buscadorClientes = document.getElementById("buscadorClientes");
     const tarjetasClientes = document.querySelectorAll(".cliente-card");
     const mensajeSinResultados = document.getElementById("mensajeSinResultados");
