@@ -75,7 +75,7 @@ namespace CucharitaLeliQR.Controllers
                 _context.Clientes.Add(cliente);
                 _context.SaveChanges();
 
-                return RedirectToAction("VerQRCliente", new { id = cliente.Id });
+                return RedirectToAction("Index");
             }
 
             return View(cliente);
